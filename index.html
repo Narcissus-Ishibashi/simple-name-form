@@ -28,8 +28,8 @@
     .form-group {
       margin-bottom: 25px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       gap: 10px;
     }
 
@@ -38,9 +38,9 @@
     }
 
     input[type="text"] {
-      padding: 8px;
+      padding: 6px;
       font-size: 16px;
-      width: 60%;
+      width: 200px;
       box-sizing: border-box;
     }
 
@@ -51,8 +51,8 @@
     .day-label {
       font-weight: bold;
       margin-bottom: 6px;
-      text-align: left; /* ← ここを追加！ */
-      margin-left: 70px; /* ← ここで時間ラベルの位置に揃える */
+      text-align: left;
+      margin-left: 70px; /* 12:00～と位置を揃える */
     }
 
     .time-pair-row {
@@ -128,7 +128,7 @@
       <!-- 名前 -->
       <div class="form-group">
         <label for="name">名前：</label>
-        <input type="text" id="name" required />
+        <input type="text" id="name" required placeholder="佐藤太郎" />
       </div>
 
       <!-- 3月29日 -->
