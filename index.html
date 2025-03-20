@@ -1,0 +1,25 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>名前フォーム</title>
+</head>
+<body>
+  <h1>名前を入力してください</h1>
+  <form onsubmit="handleSubmit(event)">
+    <input type="text" id="nameInput" placeholder="名前を入力" required />
+    <button type="submit">送信</button>
+  </form>
+  <p id="result"></p>
+
+  <script>
+    function handleSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById('nameInput').value;
+      document.getElementById('result').textContent = `こんにちは、${name}さん！`;
+    }
+  </script>
+</body>
+</html>
