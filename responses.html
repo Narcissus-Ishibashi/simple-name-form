@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>回答集計</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet" />
   <style>
@@ -24,11 +25,13 @@
     .slot h3 {
       margin-bottom: 8px;
       color: #2e7d7c;
+      font-size: 18px;
     }
 
     .result-line {
       font-size: 16px;
       margin-top: 4px;
+      word-break: break-word;
     }
 
     .button-area {
@@ -60,6 +63,30 @@
     .back-link:hover {
       text-decoration: underline;
     }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 16px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .slot h3 {
+        font-size: 16px;
+      }
+
+      .result-line {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      #clear-button {
+        width: 100%;
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -67,14 +94,12 @@
   <div id="results"></div>
 
   <div class="button-area">
-    <button id="clear-button">⚠️ 回答クリアボタン⚠️管理者専用⚠️</button>
+    <button id="clear-button">⚠️ 回答をクリアする</button>
     <a class="back-link" href="index.html">← フォームに戻る</a>
   </div>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyATmNqFm7juv8Vie3-62-L62BG8pCnCxWQ",
@@ -132,7 +157,6 @@
 
     loadResponses();
 
-    // クリアボタン機能
     document.getElementById("clear-button").addEventListener("click", async () => {
       const pw = prompt("管理用パスワードを入力してください：");
 
