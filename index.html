@@ -46,17 +46,22 @@
       text-align: left;
     }
 
-    .time-row {
+    .time-pair-row {
       display: flex;
-      align-items: center;
-      margin: 10px 0;
-      gap: 15px;
+      gap: 40px;
+      margin-top: 10px;
       flex-wrap: wrap;
     }
 
+    .time-slot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .time-label {
-      min-width: 90px;
       font-weight: bold;
+      min-width: 70px;
     }
 
     .option-button {
@@ -71,6 +76,7 @@
 
     .option-button[data-value="○"] {
       font-size: 32px;
+      line-height: 1;
     }
 
     .option-button.selected {
@@ -109,40 +115,41 @@
         <input type="text" id="name" required />
       </div>
 
-      <!-- 日別でまとめる -->
+      <!-- 3月29日 -->
       <div class="day-group">
         <div><strong>3月29日（土）</strong></div>
-
-        <div class="time-row" data-slot="slot-1">
-          <div class="time-label">12:00～</div>
-          <button type="button" class="option-button" data-value="○">○</button>
-          <button type="button" class="option-button" data-value="△">△</button>
-          <button type="button" class="option-button" data-value="✕">✕</button>
-        </div>
-
-        <div class="time-row" data-slot="slot-2">
-          <div class="time-label">17:00～</div>
-          <button type="button" class="option-button" data-value="○">○</button>
-          <button type="button" class="option-button" data-value="△">△</button>
-          <button type="button" class="option-button" data-value="✕">✕</button>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-1">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-2">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
         </div>
       </div>
 
+      <!-- 3月30日 -->
       <div class="day-group">
         <div><strong>3月30日（日）</strong></div>
-
-        <div class="time-row" data-slot="slot-3">
-          <div class="time-label">12:00～</div>
-          <button type="button" class="option-button" data-value="○">○</button>
-          <button type="button" class="option-button" data-value="△">△</button>
-          <button type="button" class="option-button" data-value="✕">✕</button>
-        </div>
-
-        <div class="time-row" data-slot="slot-4">
-          <div class="time-label">17:00～</div>
-          <button type="button" class="option-button" data-value="○">○</button>
-          <button type="button" class="option-button" data-value="△">△</button>
-          <button type="button" class="option-button" data-value="✕">✕</button>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-3">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-4">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
         </div>
       </div>
 
@@ -157,7 +164,7 @@
     const result = document.getElementById("result");
     const selection = {};
 
-    document.querySelectorAll(".time-row").forEach((row) => {
+    document.querySelectorAll(".time-slot").forEach((row) => {
       const slotName = row.dataset.slot;
       const buttons = row.querySelectorAll(".option-button");
 
