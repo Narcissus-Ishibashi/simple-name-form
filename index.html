@@ -3,30 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <title>飲み会日程調整</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: "Helvetica Neue", sans-serif;
+      font-family: 'Noto Sans JP', sans-serif;
       background-color: #fff;
       padding: 30px;
       display: flex;
       justify-content: center;
     }
+
     .container {
-      max-width: 600px;
+      max-width: 700px;
       width: 100%;
       text-align: center;
     }
+
     h1 {
       font-size: 28px;
       margin-bottom: 30px;
     }
+
     .form-group {
       margin-bottom: 25px;
       text-align: left;
     }
+
     label {
       font-weight: bold;
     }
+
     input[type="text"] {
       padding: 8px;
       font-size: 16px;
@@ -34,22 +40,27 @@
       margin-top: 5px;
       box-sizing: border-box;
     }
-    .slot-group {
-      margin-bottom: 20px;
+
+    .day-group {
+      margin-bottom: 30px;
       text-align: left;
     }
-    .slot-group strong {
-      display: block;
-      margin-bottom: 8px;
-    }
-    .options {
+
+    .time-row {
       display: flex;
-      gap: 10px;
+      align-items: center;
+      margin: 10px 0;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .time-label {
+      min-width: 90px;
+      font-weight: bold;
     }
 
     .option-button {
-      flex: 1;
-      padding: 8px 0;
+      padding: 6px 14px;
       font-size: 18px;
       border: 2px solid #ccc;
       border-radius: 6px;
@@ -57,6 +68,11 @@
       background-color: white;
       transition: 0.2s ease;
     }
+
+    .option-button[data-value="○"] {
+      font-size: 32px;
+    }
+
     .option-button.selected {
       background-color: #2e7d7c;
       color: white;
@@ -72,6 +88,7 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     .submit-button:hover {
       background-color: #236664;
     }
@@ -92,44 +109,40 @@
         <input type="text" id="name" required />
       </div>
 
-      <div class="form-group">
-        <p>各日程のご都合（〇・△・✕から選んでください）：</p>
+      <!-- 日別でまとめる -->
+      <div class="day-group">
+        <div><strong>3月29日（土）</strong></div>
 
-        <!-- 日程ごと -->
-        <div class="slot-group" data-slot="slot-1">
-          <strong>3月29日（土）12:00～</strong>
-          <div class="options">
-            <button type="button" class="option-button" data-value="○">○</button>
-            <button type="button" class="option-button" data-value="△">△</button>
-            <button type="button" class="option-button" data-value="✕">✕</button>
-          </div>
+        <div class="time-row" data-slot="slot-1">
+          <div class="time-label">12:00～</div>
+          <button type="button" class="option-button" data-value="○">○</button>
+          <button type="button" class="option-button" data-value="△">△</button>
+          <button type="button" class="option-button" data-value="✕">✕</button>
         </div>
 
-        <div class="slot-group" data-slot="slot-2">
-          <strong>3月29日（土）17:00～</strong>
-          <div class="options">
-            <button type="button" class="option-button" data-value="○">○</button>
-            <button type="button" class="option-button" data-value="△">△</button>
-            <button type="button" class="option-button" data-value="✕">✕</button>
-          </div>
+        <div class="time-row" data-slot="slot-2">
+          <div class="time-label">17:00～</div>
+          <button type="button" class="option-button" data-value="○">○</button>
+          <button type="button" class="option-button" data-value="△">△</button>
+          <button type="button" class="option-button" data-value="✕">✕</button>
+        </div>
+      </div>
+
+      <div class="day-group">
+        <div><strong>3月30日（日）</strong></div>
+
+        <div class="time-row" data-slot="slot-3">
+          <div class="time-label">12:00～</div>
+          <button type="button" class="option-button" data-value="○">○</button>
+          <button type="button" class="option-button" data-value="△">△</button>
+          <button type="button" class="option-button" data-value="✕">✕</button>
         </div>
 
-        <div class="slot-group" data-slot="slot-3">
-          <strong>3月30日（日）12:00～</strong>
-          <div class="options">
-            <button type="button" class="option-button" data-value="○">○</button>
-            <button type="button" class="option-button" data-value="△">△</button>
-            <button type="button" class="option-button" data-value="✕">✕</button>
-          </div>
-        </div>
-
-        <div class="slot-group" data-slot="slot-4">
-          <strong>3月30日（日）17:00～</strong>
-          <div class="options">
-            <button type="button" class="option-button" data-value="○">○</button>
-            <button type="button" class="option-button" data-value="△">△</button>
-            <button type="button" class="option-button" data-value="✕">✕</button>
-          </div>
+        <div class="time-row" data-slot="slot-4">
+          <div class="time-label">17:00～</div>
+          <button type="button" class="option-button" data-value="○">○</button>
+          <button type="button" class="option-button" data-value="△">△</button>
+          <button type="button" class="option-button" data-value="✕">✕</button>
         </div>
       </div>
 
@@ -142,20 +155,15 @@
   <script>
     const form = document.getElementById("schedule-form");
     const result = document.getElementById("result");
-
     const selection = {};
 
-    // ボタン風〇△✕のクリック処理
-    document.querySelectorAll(".slot-group").forEach((group) => {
-      const slotName = group.dataset.slot;
-      const buttons = group.querySelectorAll(".option-button");
+    document.querySelectorAll(".time-row").forEach((row) => {
+      const slotName = row.dataset.slot;
+      const buttons = row.querySelectorAll(".option-button");
 
       buttons.forEach((btn) => {
         btn.addEventListener("click", () => {
-          // 選択記録
           selection[slotName] = btn.dataset.value;
-
-          // 他のボタンの選択を外す
           buttons.forEach((b) => b.classList.remove("selected"));
           btn.classList.add("selected");
         });
@@ -166,12 +174,11 @@
       e.preventDefault();
       const name = document.getElementById("name").value;
 
-      // 未選択のチェック
       const missing = ["slot-1", "slot-2", "slot-3", "slot-4"].filter(
         (slot) => !selection[slot]
       );
       if (missing.length > 0) {
-        alert("すべての日程について〇△✕を選択してください！");
+        alert("すべての時間帯について選択してください！");
         return;
       }
 
