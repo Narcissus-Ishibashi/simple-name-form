@@ -2,11 +2,13 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>日程調整フォーム</title>
+  <title>飲み会日程調整</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .slot-group { margin-bottom: 20px; }
+    .option-label { margin-right: 15px; }
   </style>
 </head>
 <body>
@@ -18,11 +20,36 @@
     </div>
 
     <div class="form-group">
-      <p>参加できる日程（複数選択可）：</p>
-      <label><input type="checkbox" name="schedule" value="3月29日 12:00"> 3月29日（土）12:00～</label><br>
-      <label><input type="checkbox" name="schedule" value="3月29日 17:00"> 3月29日（土）17:00～</label><br>
-      <label><input type="checkbox" name="schedule" value="3月30日 12:00"> 3月30日（日）12:00～</label><br>
-      <label><input type="checkbox" name="schedule" value="3月30日 17:00"> 3月30日（日）17:00～</label>
+      <p>各日程のご都合（〇・△・✕から選んでください）：</p>
+
+      <!-- 日程ごとの選択肢 -->
+      <div class="slot-group">
+        <strong>3月29日（土）12:00～</strong><br />
+        <label class="option-label"><input type="radio" name="slot-1" value="○" required> ○</label>
+        <label class="option-label"><input type="radio" name="slot-1" value="△"> △</label>
+        <label class="option-label"><input type="radio" name="slot-1" value="✕"> ✕</label>
+      </div>
+
+      <div class="slot-group">
+        <strong>3月29日（土）17:00～</strong><br />
+        <label class="option-label"><input type="radio" name="slot-2" value="○" required> ○</label>
+        <label class="option-label"><input type="radio" name="slot-2" value="△"> △</label>
+        <label class="option-label"><input type="radio" name="slot-2" value="✕"> ✕</label>
+      </div>
+
+      <div class="slot-group">
+        <strong>3月30日（日）12:00～</strong><br />
+        <label class="option-label"><input type="radio" name="slot-3" value="○" required> ○</label>
+        <label class="option-label"><input type="radio" name="slot-3" value="△"> △</label>
+        <label class="option-label"><input type="radio" name="slot-3" value="✕"> ✕</label>
+      </div>
+
+      <div class="slot-group">
+        <strong>3月30日（日）17:00～</strong><br />
+        <label class="option-label"><input type="radio" name="slot-4" value="○" required> ○</label>
+        <label class="option-label"><input type="radio" name="slot-4" value="△"> △</label>
+        <label class="option-label"><input type="radio" name="slot-4" value="✕"> ✕</label>
+      </div>
     </div>
 
     <button type="submit">送信</button>
@@ -36,18 +63,25 @@
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+
       const name = document.getElementById("name").value;
-      const selected = [...form.schedule]
-        .filter((cb) => cb.checked)
-        .map((cb) => cb.value);
+
+      const schedule = {
+        "3月29日（土）12:00～": form["slot-1"].value,
+        "3月29日（土）17:00～": form["slot-2"].value,
+        "3月30日（日）12:00～": form["slot-3"].value,
+        "3月30日（日）17:00～": form["slot-4"].value,
+      };
 
       result.innerHTML = `
         <h2>ありがとうございました！</h2>
-        <p><strong>${name}</strong> さんの回答：</p>
-        <ul>${selected.map(item => `<li>${item}</li>`).join("")}</ul>
+        <p><strong>${name}</strong> さんのご回答：</p>
+        <ul>
+          ${Object.entries(schedule).map(([time, value]) => `<li>${time}：${value}</li>`).join("")}
+        </ul>
       `;
 
-      form.reset(); // フォームをクリア
+      form.reset();
     });
   </script>
 </body>
