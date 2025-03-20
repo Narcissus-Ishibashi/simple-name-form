@@ -52,7 +52,7 @@
       font-weight: bold;
       margin-bottom: 6px;
       text-align: left;
-      margin-left: 70px; /* 12:00～と位置を揃える */
+      margin-left: 70px;
     }
 
     .time-pair-row {
@@ -175,7 +175,25 @@
     <div id="result"></div>
   </div>
 
-  <script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyATmNqFm7juv8Vie3-62-L62BG8pCnCxWQ",
+      authDomain: "github-nomikai-form.firebaseapp.com",
+      projectId: "github-nomikai-form",
+      storageBucket: "github-nomikai-form.firebasestorage.app",
+      messagingSenderId: "1025705286107",
+      appId: "1:1025705286107:web:8d915cd8273e5d58c96ffe",
+      measurementId: "G-SKHX86H3E5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // フォーム送信処理
     const form = document.getElementById("schedule-form");
     const result = document.getElementById("result");
     const selection = {};
@@ -193,7 +211,7 @@
       });
     });
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
       const name = document.getElementById("name").value;
 
@@ -205,27 +223,38 @@
         return;
       }
 
-      const schedule = {
-        "3月29日（土）12:00～": selection["slot-1"],
-        "3月29日（土）17:00～": selection["slot-2"],
-        "3月30日（日）12:00～": selection["slot-3"],
-        "3月30日（日）17:00～": selection["slot-4"],
+      const responseData = {
+        name: name,
+        responses: {
+          "3月29日（土）12:00～": selection["slot-1"],
+          "3月29日（土）17:00～": selection["slot-2"],
+          "3月30日（日）12:00～": selection["slot-3"],
+          "3月30日（日）17:00～": selection["slot-4"]
+        },
+        timestamp: new Date()
       };
 
-      result.innerHTML = `
-        <h2>ありがとうございました！</h2>
-        <p><strong>${name}</strong> さんのご回答：</p>
-        <ul>
-          ${Object.entries(schedule)
-            .map(([time, value]) => `<li>${time}：${value}</li>`)
-            .join("")}
-        </ul>
-      `;
+      try {
+        await addDoc(collection(db, "responses"), responseData);
+        alert("送信が完了しました！");
 
-      form.reset();
-      document.querySelectorAll(".option-button").forEach((b) =>
-        b.classList.remove("selected")
-      );
+        result.innerHTML = `
+          <h2>ありがとうございました！</h2>
+          <p><strong>${name}</strong> さんのご回答：</p>
+          <ul>
+            ${Object.entries(responseData.responses)
+              .map(([time, value]) => `<li>${time}：${value}</li>`)
+              .join("")}
+          </ul>
+        `;
+        form.reset();
+        document.querySelectorAll(".option-button").forEach((b) =>
+          b.classList.remove("selected")
+        );
+      } catch (error) {
+        console.error("送信エラー:", error);
+        alert("送信に失敗しました。");
+      }
     });
   </script>
 </body>
