@@ -133,6 +133,23 @@
       margin-top: 40px;
     }
 
+    #response-info {
+      border: 2px dashed #aaa;
+      padding: 16px;
+      margin-top: 40px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    #response-info .note {
+      color: red;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
     ul {
       padding-left: 0;
       list-style: none;
@@ -192,6 +209,13 @@
     </form>
 
     <div id="result"></div>
+
+    <div id="response-info" style="display: none;">
+      <div><strong>回答者</strong><br><span id="responder-names"></span></div>
+      <div class="note">
+        ※回答を修正したい場合は前回に回答した際と同じ名前で入力の上、再度ご回答ください。
+      </div>
+    </div>
   </div>
 
   <!-- Firebase SDKs -->
@@ -216,6 +240,7 @@
     const result = document.getElementById("result");
     const selection = {};
 
+    // 選択ボタンの処理
     document.querySelectorAll(".time-slot").forEach((row) => {
       const slotName = row.dataset.slot;
       const buttons = row.querySelectorAll(".option-button");
@@ -228,6 +253,16 @@
         });
       });
     });
+
+    // 回答者一覧の表示処理
+    async function showResponders() {
+      const snapshot = await db.collection("responses").get();
+      const names = snapshot.docs.map(doc => doc.data().name).filter(n => n);
+      document.getElementById("responder-names").textContent = names.join(" / ");
+      document.getElementById("response-info").style.display = "block";
+    }
+
+    showResponders(); // 最初に呼び出し
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -253,8 +288,18 @@
       };
 
       try {
-        await db.collection("responses").add(responseData);
-        alert("送信が完了しました！");
+        const querySnapshot = await db.collection("responses")
+          .where("name", "==", name)
+          .get();
+
+        if (!querySnapshot.empty) {
+          const docId = querySnapshot.docs[0].id;
+          await db.collection("responses").doc(docId).set(responseData);
+        } else {
+          await db.collection("responses").add(responseData);
+        }
+
+        alert("送信が完了しました！（上書き済み）");
 
         result.innerHTML = `
           <h2>ありがとうございました！</h2>
@@ -269,6 +314,8 @@
         document.querySelectorAll(".option-button").forEach((b) =>
           b.classList.remove("selected")
         );
+
+        await showResponders(); // 再表示
       } catch (error) {
         console.error("送信エラー:", error);
         alert("送信に失敗しました。");
