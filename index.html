@@ -1,25 +1,54 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>名前フォーム</title>
+  <title>日程調整フォーム</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+  </style>
 </head>
 <body>
-  <h1>名前を入力してください</h1>
-  <form onsubmit="handleSubmit(event)">
-    <input type="text" id="nameInput" placeholder="名前を入力" required />
+  <h1>🍻 飲み会日程調整</h1>
+  <form id="schedule-form">
+    <div class="form-group">
+      <label for="name">名前：</label>
+      <input type="text" id="name" required />
+    </div>
+
+    <div class="form-group">
+      <p>参加できる日程（複数選択可）：</p>
+      <label><input type="checkbox" name="schedule" value="3月29日 12:00"> 3月29日（土）12:00～</label><br>
+      <label><input type="checkbox" name="schedule" value="3月29日 17:00"> 3月29日（土）17:00～</label><br>
+      <label><input type="checkbox" name="schedule" value="3月30日 12:00"> 3月30日（日）12:00～</label><br>
+      <label><input type="checkbox" name="schedule" value="3月30日 17:00"> 3月30日（日）17:00～</label>
+    </div>
+
     <button type="submit">送信</button>
   </form>
-  <p id="result"></p>
+
+  <div id="result" style="margin-top: 30px;"></div>
 
   <script>
-    function handleSubmit(event) {
-      event.preventDefault();
-      const name = document.getElementById('nameInput').value;
-      document.getElementById('result').textContent = `こんにちは、${name}さん！`;
-    }
+    const form = document.getElementById("schedule-form");
+    const result = document.getElementById("result");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const selected = [...form.schedule]
+        .filter((cb) => cb.checked)
+        .map((cb) => cb.value);
+
+      result.innerHTML = `
+        <h2>ありがとうございました！</h2>
+        <p><strong>${name}</strong> さんの回答：</p>
+        <ul>${selected.map(item => `<li>${item}</li>`).join("")}</ul>
+      `;
+
+      form.reset(); // フォームをクリア
+    });
   </script>
 </body>
 </html>
