@@ -17,39 +17,35 @@
       max-width: 800px;
       width: 100%;
       padding: 0 32px;
-      text-align: left;
+      text-align: center;
     }
 
     h1 {
       font-size: 28px;
       margin-bottom: 30px;
-      text-align: center;
     }
 
     .form-group {
       margin-bottom: 25px;
       display: flex;
       align-items: center;
-      padding-left: 80px;
+      justify-content: center;
       gap: 10px;
     }
 
     .form-group label {
-      width: 80px;
-      text-align: right;
       font-weight: bold;
     }
 
     input[type="text"] {
       padding: 8px;
-      font-size: 18px;
-      width: 70%;
+      font-size: 16px;
+      width: 60%;
       box-sizing: border-box;
     }
 
     .day-group {
       margin-bottom: 30px;
-      padding-left: 80px;
     }
 
     .day-label {
@@ -61,6 +57,7 @@
       display: flex;
       gap: 40px;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .time-slot {
@@ -118,12 +115,13 @@
     ul {
       padding-left: 0;
       list-style: none;
+      text-align: left;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🍻 飲み会日程調整🍻</h1>
+    <h1>🍻 飲み会日程調整 🍻</h1>
     <form id="schedule-form">
       <!-- 名前 -->
       <div class="form-group">
