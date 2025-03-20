@@ -44,9 +44,25 @@
     }
     .options {
       display: flex;
-      gap: 15px;
-      margin-left: 10px;
+      gap: 10px;
     }
+
+    .option-button {
+      flex: 1;
+      padding: 8px 0;
+      font-size: 18px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: white;
+      transition: 0.2s ease;
+    }
+    .option-button.selected {
+      background-color: #2e7d7c;
+      color: white;
+      border-color: #2e7d7c;
+    }
+
     .submit-button {
       padding: 10px 20px;
       font-size: 16px;
@@ -59,6 +75,7 @@
     .submit-button:hover {
       background-color: #236664;
     }
+
     ul {
       text-align: left;
       padding-left: 0;
@@ -78,39 +95,40 @@
       <div class="form-group">
         <p>各日程のご都合（〇・△・✕から選んでください）：</p>
 
-        <div class="slot-group">
+        <!-- 日程ごと -->
+        <div class="slot-group" data-slot="slot-1">
           <strong>3月29日（土）12:00～</strong>
           <div class="options">
-            <label><input type="radio" name="slot-1" value="○" required> ○</label>
-            <label><input type="radio" name="slot-1" value="△"> △</label>
-            <label><input type="radio" name="slot-1" value="✕"> ✕</label>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
           </div>
         </div>
 
-        <div class="slot-group">
+        <div class="slot-group" data-slot="slot-2">
           <strong>3月29日（土）17:00～</strong>
           <div class="options">
-            <label><input type="radio" name="slot-2" value="○" required> ○</label>
-            <label><input type="radio" name="slot-2" value="△"> △</label>
-            <label><input type="radio" name="slot-2" value="✕"> ✕</label>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
           </div>
         </div>
 
-        <div class="slot-group">
+        <div class="slot-group" data-slot="slot-3">
           <strong>3月30日（日）12:00～</strong>
           <div class="options">
-            <label><input type="radio" name="slot-3" value="○" required> ○</label>
-            <label><input type="radio" name="slot-3" value="△"> △</label>
-            <label><input type="radio" name="slot-3" value="✕"> ✕</label>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
           </div>
         </div>
 
-        <div class="slot-group">
+        <div class="slot-group" data-slot="slot-4">
           <strong>3月30日（日）17:00～</strong>
           <div class="options">
-            <label><input type="radio" name="slot-4" value="○" required> ○</label>
-            <label><input type="radio" name="slot-4" value="△"> △</label>
-            <label><input type="radio" name="slot-4" value="✕"> ✕</label>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
           </div>
         </div>
       </div>
@@ -125,16 +143,43 @@
     const form = document.getElementById("schedule-form");
     const result = document.getElementById("result");
 
+    const selection = {};
+
+    // ボタン風〇△✕のクリック処理
+    document.querySelectorAll(".slot-group").forEach((group) => {
+      const slotName = group.dataset.slot;
+      const buttons = group.querySelectorAll(".option-button");
+
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          // 選択記録
+          selection[slotName] = btn.dataset.value;
+
+          // 他のボタンの選択を外す
+          buttons.forEach((b) => b.classList.remove("selected"));
+          btn.classList.add("selected");
+        });
+      });
+    });
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-
       const name = document.getElementById("name").value;
 
+      // 未選択のチェック
+      const missing = ["slot-1", "slot-2", "slot-3", "slot-4"].filter(
+        (slot) => !selection[slot]
+      );
+      if (missing.length > 0) {
+        alert("すべての日程について〇△✕を選択してください！");
+        return;
+      }
+
       const schedule = {
-        "3月29日（土）12:00～": form["slot-1"].value,
-        "3月29日（土）17:00～": form["slot-2"].value,
-        "3月30日（日）12:00～": form["slot-3"].value,
-        "3月30日（日）17:00～": form["slot-4"].value,
+        "3月29日（土）12:00～": selection["slot-1"],
+        "3月29日（土）17:00～": selection["slot-2"],
+        "3月30日（日）12:00～": selection["slot-3"],
+        "3月30日（日）17:00～": selection["slot-4"],
       };
 
       result.innerHTML = `
@@ -146,6 +191,7 @@
       `;
 
       form.reset();
+      document.querySelectorAll(".option-button").forEach((b) => b.classList.remove("selected"));
     });
   </script>
 </body>
