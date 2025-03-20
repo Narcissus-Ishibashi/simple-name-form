@@ -178,10 +178,12 @@
         gap: 20px;
       }
 
-      .time-slot {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+  .time-slot {
+    flex-direction: row; /* 横並びを維持！ */
+    flex-wrap: wrap;     /* 折り返し可能にする（画面幅に応じて） */
+    align-items: center;
+    gap: 10px;
+  }
 
       .option-button {
         font-size: 24px;
