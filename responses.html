@@ -45,6 +45,31 @@
       margin-left: 8px;
       color: #d4af37;
     }
+    .clear-area {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .clear-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #e53935;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .back-link a {
+      color: #2e7d7c;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .back-link a:hover {
+      text-decoration: underline;
+    }
     @media (max-width: 480px) {
       .day-row {
         flex-direction: column;
@@ -57,6 +82,14 @@
 <body>
   <h1>📊 日時別参加人数 集計</h1>
   <div class="summary" id="summary"></div>
+
+  <div class="clear-area">
+    <button id="clear-button" class="clear-button">回答を全てクリアにする</button>
+  </div>
+
+  <div class="back-link">
+    <a href="index.html">← フォームに戻る</a>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -103,7 +136,7 @@
         });
       });
 
-      // 👑つけるために最大を探す
+      // 👑 一番多い枠を探す
       let maxCount = 0;
       let maxSlots = []; // [{ day: "6月X日", time: "昼" }]
       days.forEach(day => {
@@ -118,7 +151,7 @@
         });
       });
 
-      // 表示を作る
+      // 表示作成
       days.forEach(day => {
         const { 昼, 夜 } = counts[day];
         const row = document.createElement("div");
@@ -160,6 +193,29 @@
     }).catch(err => {
       console.error("取得エラー", err);
       summary.innerHTML = "<p>データの取得に失敗しました。</p>";
+    });
+
+    // 全クリアボタン
+    document.getElementById("clear-button").addEventListener("click", async () => {
+      const input = prompt("パスワードを入力してください");
+      if (input !== "tonegawasakurai") {
+        alert("パスワードが間違っています！");
+        return;
+      }
+
+      if (!confirm("本当に全ての回答を削除しますか？")) return;
+
+      try {
+        const snapshot = await db.collection("responses").get();
+        const batch = db.batch();
+        snapshot.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        alert("全ての回答を削除しました！");
+        location.reload();
+      } catch (error) {
+        console.error("削除エラー:", error);
+        alert("削除に失敗しました。");
+      }
     });
   </script>
 </body>
