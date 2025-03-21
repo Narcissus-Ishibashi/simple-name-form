@@ -94,6 +94,20 @@
       list-style: none;
       text-align: left;
     }
+    .time-toggle-button {
+      padding: 8px 16px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: white;
+      transition: 0.2s ease;
+    }
+    .time-toggle-button.active {
+      background-color: #2e7d7c;
+      color: white;
+      border-color: #2e7d7c;
+    }
   </style>
 </head>
 <body>
@@ -105,7 +119,6 @@
         <input type="text" id="name" required placeholder="さがら" />
       </div>
 
-      <!-- 日程選択：昼／夜チェックボックスがここに入る -->
       <div id="days-container"></div>
 
       <div class="button-group">
@@ -122,7 +135,6 @@
     </div>
   </div>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script>
@@ -160,11 +172,18 @@
       group.innerHTML = `
         <div class="day-label">${day}</div>
         <div class="time-pair-row">
-          <label><input type="checkbox" data-day="${day}" data-time="昼" /> 昼に参加</label>
-          <label><input type="checkbox" data-day="${day}" data-time="夜" /> 夜に参加</label>
+          <button type="button" class="time-toggle-button" data-day="${day}" data-time="昼">昼に参加</button>
+          <button type="button" class="time-toggle-button" data-day="${day}" data-time="夜">夜に参加</button>
         </div>
       `;
       container.appendChild(group);
+    });
+
+    // ボタンのON/OFF切り替え
+    document.addEventListener("click", function (e) {
+      if (e.target.classList.contains("time-toggle-button")) {
+        e.target.classList.toggle("active");
+      }
     });
 
     async function showResponders() {
@@ -183,14 +202,12 @@
         return;
       }
 
-      const inputs = document.querySelectorAll('input[type="checkbox"]');
       const responses = {};
-
       days.forEach(day => {
-        const dayInputs = Array.from(inputs).filter(input => input.dataset.day === day);
+        const buttons = document.querySelectorAll(`.time-toggle-button[data-day="${day}"]`);
         responses[day] = {
-          昼: dayInputs.find(i => i.dataset.time === "昼").checked,
-          夜: dayInputs.find(i => i.dataset.time === "夜").checked
+          昼: buttons[0].classList.contains("active"),
+          夜: buttons[1].classList.contains("active")
         };
       });
 
@@ -222,6 +239,7 @@
           </ul>
         `;
         form.reset();
+        document.querySelectorAll(".time-toggle-button").forEach(btn => btn.classList.remove("active"));
         await showResponders();
       } catch (error) {
         console.error("送信エラー:", error);
