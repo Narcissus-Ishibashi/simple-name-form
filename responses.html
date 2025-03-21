@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>回答集計</title>
+  <title>日時別集計</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -13,55 +13,50 @@
     }
     h1 {
       text-align: center;
-      font-size: 28px;
+      font-size: 26px;
       margin-bottom: 30px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      overflow-x: auto;
+    .summary {
+      max-width: 600px;
+      margin: 0 auto;
     }
-    th, td {
+    .day-row {
+      background: #fff;
       border: 1px solid #ccc;
-      padding: 6px 10px;
-      text-align: center;
-      white-space: nowrap;
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 14px;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
     }
-    th {
-      background-color: #e0e0e0;
-      position: sticky;
-      top: 0;
+    .label {
+      font-weight: bold;
+      margin-bottom: 4px;
     }
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
+    .counts {
+      display: flex;
+      gap: 16px;
     }
-    .note {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #666;
-      text-align: center;
-    }
-    .icon {
+    .crown {
       font-size: 18px;
+      margin-left: 8px;
+      color: #d4af37;
     }
-    .wrap {
-      overflow-x: auto;
+    @media (max-width: 480px) {
+      .day-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>📊 回答集計</h1>
-  <div class="wrap">
-    <table id="responses-table">
-      <thead>
-        <tr>
-          <th>名前</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <p class="note">※同じ名前で再送信すると上書きされます。</p>
+  <h1>📊 日時別参加人数 集計</h1>
+  <div class="summary" id="summary"></div>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -78,57 +73,93 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const table = document.getElementById("responses-table");
-    const tbody = table.querySelector("tbody");
-    const theadRow = table.querySelector("thead tr");
+    const summary = document.getElementById("summary");
 
-    // 日付の順番（週ごとに土日）
-    const orderedDays = [
+    const days = [
       "6月1日（日）",
-      "6月7日（土）", "6月8日（日）",
-      "6月14日（土）", "6月15日（日）",
-      "6月21日（土）", "6月22日（日）",
-      "6月28日（土）", "6月29日（日）"
+      "6月7日（土）",
+      "6月8日（日）",
+      "6月14日（土）",
+      "6月15日（日）",
+      "6月21日（土）",
+      "6月22日（日）",
+      "6月28日（土）",
+      "6月29日（日）"
     ];
 
-    // テーブルヘッダーを作成
-    orderedDays.forEach(day => {
-      const th = document.createElement("th");
-      th.textContent = day;
-      theadRow.appendChild(th);
+    const counts = {};
+    days.forEach(day => {
+      counts[day] = { 昼: 0, 夜: 0 };
     });
 
-    // 出欠をアイコンで表示
-    function formatResponse(dayData) {
-      const isDay = dayData?.["昼"];
-      const isNight = dayData?.["夜"];
-      if (isDay && isNight) return "☀🌙";
-      if (isDay) return "☀";
-      if (isNight) return "🌙";
-      return "✕";
-    }
-
-    // Firestoreからデータ取得
-    db.collection("responses").orderBy("timestamp", "asc").get().then(snapshot => {
+    db.collection("responses").get().then(snapshot => {
       snapshot.forEach(doc => {
         const data = doc.data();
-        const tr = document.createElement("tr");
-        const nameTd = document.createElement("td");
-        nameTd.textContent = data.name || "(名無し)";
-        tr.appendChild(nameTd);
-
-        orderedDays.forEach(day => {
-          const td = document.createElement("td");
-          td.textContent = formatResponse(data.responses?.[day]);
-          td.className = "icon";
-          tr.appendChild(td);
+        const responses = data.responses || {};
+        days.forEach(day => {
+          const answer = responses[day];
+          if (answer?.昼) counts[day].昼 += 1;
+          if (answer?.夜) counts[day].夜 += 1;
         });
+      });
 
-        tbody.appendChild(tr);
+      // 👑つけるために最大を探す
+      let maxCount = 0;
+      let maxSlots = []; // [{ day: "6月X日", time: "昼" }]
+      days.forEach(day => {
+        ["昼", "夜"].forEach(time => {
+          const value = counts[day][time];
+          if (value > maxCount) {
+            maxCount = value;
+            maxSlots = [{ day, time }];
+          } else if (value === maxCount) {
+            maxSlots.push({ day, time });
+          }
+        });
+      });
+
+      // 表示を作る
+      days.forEach(day => {
+        const { 昼, 夜 } = counts[day];
+        const row = document.createElement("div");
+        row.className = "day-row";
+
+        const label = document.createElement("div");
+        label.className = "label";
+        label.textContent = day;
+
+        const countsDiv = document.createElement("div");
+        countsDiv.className = "counts";
+
+        const dayText = document.createElement("div");
+        dayText.textContent = `昼：${昼}名`;
+        if (maxSlots.find(s => s.day === day && s.time === "昼")) {
+          const crown = document.createElement("span");
+          crown.className = "crown";
+          crown.textContent = "👑";
+          dayText.appendChild(crown);
+        }
+
+        const nightText = document.createElement("div");
+        nightText.textContent = `夜：${夜}名`;
+        if (maxSlots.find(s => s.day === day && s.time === "夜")) {
+          const crown = document.createElement("span");
+          crown.className = "crown";
+          crown.textContent = "👑";
+          nightText.appendChild(crown);
+        }
+
+        countsDiv.appendChild(dayText);
+        countsDiv.appendChild(nightText);
+
+        row.appendChild(label);
+        row.appendChild(countsDiv);
+
+        summary.appendChild(row);
       });
     }).catch(err => {
-      alert("集計データの取得に失敗しました");
-      console.error(err);
+      console.error("取得エラー", err);
+      summary.innerHTML = "<p>データの取得に失敗しました。</p>";
     });
   </script>
 </body>
