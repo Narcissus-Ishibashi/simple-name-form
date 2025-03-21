@@ -34,26 +34,54 @@
       width: 200px;
       box-sizing: border-box;
     }
-    .day-group { margin-bottom: 30px; }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px 20px;
+    }
+
+    .day-block {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 90px;
+    }
+
     .day-label {
       font-weight: bold;
-      margin-bottom: 6px;
-      text-align: left;
-      margin-left: 70px;
+      margin-bottom: 10px;
     }
-    .time-pair-row {
+
+    .button-group {
       display: flex;
-      gap: 40px;
-      flex-wrap: wrap;
+      gap: 12px;
       justify-content: center;
     }
-    .button-group {
+
+    .time-toggle-button {
+      padding: 8px 16px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: white;
+      transition: 0.2s ease;
+    }
+    .time-toggle-button.active {
+      background-color: #2e7d7c;
+      color: white;
+      border-color: #2e7d7c;
+    }
+
+    .submit-area {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 14px;
       margin-top: 30px;
     }
+
     .submit-button {
       width: 200px;
       padding: 12px 24px;
@@ -66,14 +94,18 @@
       transition: background-color 0.2s ease;
     }
     .submit-button:hover { background-color: #236664; }
+
     .result-link {
-      margin-top: 20px;
       font-size: 16px;
       color: #6b34c9;
       text-decoration: none;
     }
     .result-link:hover { text-decoration: underline; }
-    #result { margin-top: 40px; }
+
+    #result {
+      margin-top: 40px;
+    }
+
     #response-info {
       border: 2px dashed #aaa;
       padding: 16px;
@@ -89,24 +121,11 @@
       font-size: 13px;
       margin-top: 8px;
     }
+
     ul {
       padding-left: 0;
       list-style: none;
       text-align: left;
-    }
-    .time-toggle-button {
-      padding: 8px 16px;
-      font-size: 16px;
-      border: 2px solid #ccc;
-      border-radius: 6px;
-      cursor: pointer;
-      background-color: white;
-      transition: 0.2s ease;
-    }
-    .time-toggle-button.active {
-      background-color: #2e7d7c;
-      color: white;
-      border-color: #2e7d7c;
     }
   </style>
 </head>
@@ -119,9 +138,9 @@
         <input type="text" id="name" required placeholder="さがら" />
       </div>
 
-      <div id="days-container"></div>
+      <div class="schedule-grid" id="schedule-grid"></div>
 
-      <div class="button-group">
+      <div class="submit-area">
         <button class="submit-button" type="submit">送信</button>
         <a href="responses.html" class="result-link">回答集計を見る</a>
       </div>
@@ -134,7 +153,6 @@
       <div class="note">※回答を修正したい場合は前回に回答した際と同じ名前で入力の上、再度ご回答ください。</div>
     </div>
   </div>
-
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script>
@@ -151,41 +169,54 @@
     const db = firebase.firestore();
 
     const form = document.getElementById("schedule-form");
+    const grid = document.getElementById("schedule-grid");
     const result = document.getElementById("result");
 
-    const days = [
-      "6月1日（日）",
-      "6月7日（土）",
-      "6月8日（日）",
-      "6月14日（土）",
-      "6月15日（日）",
-      "6月21日（土）",
-      "6月22日（日）",
-      "6月28日（土）",
-      "6月29日（日）"
+    const weeks = [
+      [null, "6月1日（日）"],
+      ["6月7日（土）", "6月8日（日）"],
+      ["6月14日（土）", "6月15日（日）"],
+      ["6月21日（土）", "6月22日（日）"],
+      ["6月28日（土）", "6月29日（日）"]
     ];
 
-    const container = document.getElementById("days-container");
-    days.forEach((day) => {
-      const group = document.createElement("div");
-      group.className = "day-group";
-      group.innerHTML = `
-        <div class="day-label">${day}</div>
-        <div class="time-pair-row">
-          <button type="button" class="time-toggle-button" data-day="${day}" data-time="昼">昼</button>
-          <button type="button" class="time-toggle-button" data-day="${day}" data-time="夜">夜</button>
-        </div>
-      `;
-      container.appendChild(group);
+    // 画面に日程を描画
+    weeks.forEach(([sat, sun]) => {
+      const satBlock = document.createElement("div");
+      satBlock.className = "day-block";
+      if (sat) {
+        satBlock.innerHTML = `
+          <div class="day-label">${sat}</div>
+          <div class="button-group">
+            <button type="button" class="time-toggle-button" data-day="${sat}" data-time="昼">昼</button>
+            <button type="button" class="time-toggle-button" data-day="${sat}" data-time="夜">夜</button>
+          </div>
+        `;
+      }
+      grid.appendChild(satBlock);
+
+      const sunBlock = document.createElement("div");
+      sunBlock.className = "day-block";
+      if (sun) {
+        sunBlock.innerHTML = `
+          <div class="day-label">${sun}</div>
+          <div class="button-group">
+            <button type="button" class="time-toggle-button" data-day="${sun}" data-time="昼">昼</button>
+            <button type="button" class="time-toggle-button" data-day="${sun}" data-time="夜">夜</button>
+          </div>
+        `;
+      }
+      grid.appendChild(sunBlock);
     });
 
-    // ボタンのON/OFF切り替え
+    // トグルボタン切り替え処理
     document.addEventListener("click", function (e) {
       if (e.target.classList.contains("time-toggle-button")) {
         e.target.classList.toggle("active");
       }
     });
 
+    // 回答者一覧を表示
     async function showResponders() {
       const snapshot = await db.collection("responses").get();
       const names = snapshot.docs.map(doc => doc.data().name).filter(n => n);
@@ -194,6 +225,7 @@
     }
     showResponders();
 
+    // 送信処理
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       const name = document.getElementById("name").value.trim();
@@ -202,13 +234,13 @@
         return;
       }
 
+      const buttons = document.querySelectorAll(".time-toggle-button");
       const responses = {};
-      days.forEach(day => {
-        const buttons = document.querySelectorAll(`.time-toggle-button[data-day="${day}"]`);
-        responses[day] = {
-          昼: buttons[0].classList.contains("active"),
-          夜: buttons[1].classList.contains("active")
-        };
+      buttons.forEach((btn) => {
+        const day = btn.dataset.day;
+        const time = btn.dataset.time;
+        if (!responses[day]) responses[day] = { 昼: false, 夜: false };
+        if (btn.classList.contains("active")) responses[day][time] = true;
       });
 
       const responseData = {
