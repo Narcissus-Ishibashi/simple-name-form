@@ -8,95 +8,60 @@
   <style>
     body {
       font-family: 'Noto Sans JP', sans-serif;
+      background-color: #f8f8f8;
       padding: 40px 24px;
-      text-align: center;
-      background-color: #fff;
     }
-
     h1 {
-      font-size: 26px;
+      text-align: center;
+      font-size: 28px;
       margin-bottom: 30px;
     }
-
-    .slot {
-      margin-bottom: 30px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow-x: auto;
     }
-
-    .slot h3 {
-      margin-bottom: 8px;
-      color: #2e7d7c;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    th {
+      background-color: #e0e0e0;
+      position: sticky;
+      top: 0;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .note {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+    .icon {
       font-size: 18px;
     }
-
-    .result-line {
-      font-size: 16px;
-      margin-top: 4px;
-      word-break: break-word;
-    }
-
-    .button-area {
-      margin-top: 40px;
-    }
-
-    #clear-button {
-      padding: 12px 24px;
-      background-color: #d9534f;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    #clear-button:hover {
-      background-color: #c9302c;
-    }
-
-    .back-link {
-      display: block;
-      margin-top: 24px;
-      font-size: 14px;
-      text-decoration: none;
-      color: #2e7d7c;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 20px 16px;
-      }
-
-      h1 {
-        font-size: 22px;
-      }
-
-      .slot h3 {
-        font-size: 16px;
-      }
-
-      .result-line {
-        font-size: 14px;
-        line-height: 1.6;
-      }
-
-      #clear-button {
-        width: 100%;
-        font-size: 16px;
-      }
+    .wrap {
+      overflow-x: auto;
     }
   </style>
 </head>
 <body>
-  <h1>📝 回答集計 📝</h1>
-  <div id="results"></div>
-
-  <div class="button-area">
-    <button id="clear-button">⚠️ 回答をクリアする</button>
-    <a class="back-link" href="index.html">← フォームに戻る</a>
+  <h1>📊 回答集計</h1>
+  <div class="wrap">
+    <table id="responses-table">
+      <thead>
+        <tr>
+          <th>名前</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
+  <p class="note">※同じ名前で再送信すると上書きされます。</p>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -110,74 +75,60 @@
       appId: "1:1025705286107:web:8d915cd8273e5d58c96ffe",
       measurementId: "G-SKHX86H3E5"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const timeSlots = [
-      { id: "3月29日（土）12:00～" },
-      { id: "3月29日（土）17:00～" },
-      { id: "3月30日（日）12:00～" },
-      { id: "3月30日（日）17:00～" },
+    const table = document.getElementById("responses-table");
+    const tbody = table.querySelector("tbody");
+    const theadRow = table.querySelector("thead tr");
+
+    // 日付の順番（週ごとに土日）
+    const orderedDays = [
+      "6月1日（日）",
+      "6月7日（土）", "6月8日（日）",
+      "6月14日（土）", "6月15日（日）",
+      "6月21日（土）", "6月22日（日）",
+      "6月28日（土）", "6月29日（日）"
     ];
 
-    function renderResults(participants) {
-      const container = document.getElementById("results");
-      container.innerHTML = "";
+    // テーブルヘッダーを作成
+    orderedDays.forEach(day => {
+      const th = document.createElement("th");
+      th.textContent = day;
+      theadRow.appendChild(th);
+    });
 
-      timeSlots.forEach(slot => {
-        const responses = { "○": [], "△": 0, "✕": 0 };
+    // 出欠をアイコンで表示
+    function formatResponse(dayData) {
+      const isDay = dayData?.["昼"];
+      const isNight = dayData?.["夜"];
+      if (isDay && isNight) return "☀🌙";
+      if (isDay) return "☀";
+      if (isNight) return "🌙";
+      return "✕";
+    }
 
-        participants.forEach(p => {
-          const res = p.responses?.[slot.id];
-          if (res === "○") responses["○"].push(p.name);
-          else if (res === "△") responses["△"]++;
-          else if (res === "✕") responses["✕"]++;
+    // Firestoreからデータ取得
+    db.collection("responses").orderBy("timestamp", "asc").get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const tr = document.createElement("tr");
+        const nameTd = document.createElement("td");
+        nameTd.textContent = data.name || "(名無し)";
+        tr.appendChild(nameTd);
+
+        orderedDays.forEach(day => {
+          const td = document.createElement("td");
+          td.textContent = formatResponse(data.responses?.[day]);
+          td.className = "icon";
+          tr.appendChild(td);
         });
 
-        const div = document.createElement("div");
-        div.className = "slot";
-        div.innerHTML = `
-          <h3>🗓 ${slot.id}</h3>
-          <div class="result-line">
-            〇 ${responses["○"].length}人：${responses["○"].join(" / ") || "なし"}　
-            △ ${responses["△"]}人　
-            ✕ ${responses["✕"]}人
-          </div>
-        `;
-        container.appendChild(div);
+        tbody.appendChild(tr);
       });
-    }
-
-    async function loadResponses() {
-      const snapshot = await db.collection("responses").orderBy("timestamp").get();
-      const participants = snapshot.docs.map(doc => doc.data());
-      renderResults(participants);
-    }
-
-    loadResponses();
-
-    document.getElementById("clear-button").addEventListener("click", async () => {
-      const pw = prompt("管理用パスワードを入力してください：");
-
-      if (pw !== "tonegawasakurai") {
-        alert("パスワードが違います。");
-        return;
-      }
-
-      const ok = confirm("⚠️ 本当にすべての回答を削除しますか？");
-
-      if (ok) {
-        const snapshot = await db.collection("responses").get();
-        const batch = db.batch();
-        snapshot.forEach(doc => {
-          batch.delete(doc.ref);
-        });
-
-        await batch.commit();
-        alert("すべての回答を削除しました！");
-        location.reload();
-      }
+    }).catch(err => {
+      alert("集計データの取得に失敗しました");
+      console.error(err);
     });
   </script>
 </body>
