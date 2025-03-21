@@ -13,19 +13,13 @@
       display: flex;
       justify-content: center;
     }
-
     .container {
       max-width: 800px;
       width: 100%;
       padding: 0 32px;
       text-align: center;
     }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 30px;
-    }
-
+    h1 { font-size: 28px; margin-bottom: 30px; }
     .form-group {
       margin-bottom: 25px;
       display: flex;
@@ -33,47 +27,35 @@
       align-items: center;
       gap: 10px;
     }
-
-    .form-group label {
-      font-weight: bold;
-    }
-
+    .form-group label { font-weight: bold; }
     input[type="text"] {
       padding: 6px;
       font-size: 16px;
       width: 200px;
       box-sizing: border-box;
     }
-
-    .day-group {
-      margin-bottom: 30px;
-    }
-
+    .day-group { margin-bottom: 30px; }
     .day-label {
       font-weight: bold;
       margin-bottom: 6px;
       text-align: left;
       margin-left: 70px;
     }
-
     .time-pair-row {
       display: flex;
       gap: 40px;
       flex-wrap: wrap;
       justify-content: center;
     }
-
     .time-slot {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-
     .time-label {
       font-weight: bold;
       min-width: 70px;
     }
-
     .option-button {
       padding: 6px 14px;
       font-size: 18px;
@@ -83,18 +65,12 @@
       background-color: white;
       transition: 0.2s ease;
     }
-
-    .option-button[data-value="○"] {
-      font-size: 32px;
-      line-height: 1;
-    }
-
+    .option-button[data-value="○"] { font-size: 32px; line-height: 1; }
     .option-button.selected {
       background-color: #2e7d7c;
       color: white;
       border-color: #2e7d7c;
     }
-
     .button-group {
       display: flex;
       flex-direction: column;
@@ -102,7 +78,6 @@
       gap: 14px;
       margin-top: 30px;
     }
-
     .submit-button {
       width: 200px;
       padding: 12px 24px;
@@ -114,26 +89,15 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
-
-    .submit-button:hover {
-      background-color: #236664;
-    }
-
+    .submit-button:hover { background-color: #236664; }
     .result-link {
       margin-top: 20px;
       font-size: 16px;
       color: #6b34c9;
       text-decoration: none;
     }
-
-    .result-link:hover {
-      text-decoration: underline;
-    }
-
-    #result {
-      margin-top: 40px;
-    }
-
+    .result-link:hover { text-decoration: underline; }
+    #result { margin-top: 40px; }
     #response-info {
       border: 2px dashed #aaa;
       padding: 16px;
@@ -144,203 +108,291 @@
       text-align: left;
       font-size: 14px;
     }
-
     #response-info .note {
       color: red;
       font-size: 13px;
       margin-top: 8px;
     }
-
     ul {
       padding-left: 0;
       list-style: none;
       text-align: left;
-    }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 20px 16px;
-      }
-
-      .form-group {
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        flex-wrap: nowrap; /* ← 追加：折り返させない */
-      }
-
-      .form-group label {
-        flex: 0 0 auto;
-        margin-right: 8px;
-        white-space: nowrap; /* ← 名前：が折れないように */
-      }
-      
-      input[type="text"] {
-        width: 70%;     /* ← 入力欄の幅をやや狭く調整 */
-        height: 40px;
-        font-size: 16px;
-      }
-
-      .day-label {
-        margin-left: 0;
-        text-align: center;
-      }
-
-      .time-pair-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-      }
-
-  .time-slot {
-    flex-direction: row; /* 横並びを維持！ */
-    flex-wrap: wrap;     /* 折り返し可能にする（画面幅に応じて） */
-    align-items: center;
-    gap: 10px;
-  }
-
-      .option-button {
-        font-size: 24px;
-        padding: 8px 14px;
-      }
-
-      .submit-button {
-        width: 100%;
-      }
-
-      .result-link {
-        font-size: 15px;
-      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🍻 局長・櫻井さんおめでとう会日程調整 🍻</h1>
-<!-- 🔽 置き換え用フォームエリア -->
-<form id="schedule-form">
-  <div class="form-group">
-    <label for="name">名前：</label>
-    <input type="text" id="name" required placeholder="さがら" />
-  </div>
-
-  <!-- 🔽 日程エリア（昼/夜） -->
-  <div id="days-container"></div>
-
-  <div class="button-group">
-    <button class="submit-button" type="submit">送信</button>
-    <a href="responses.html" class="result-link">回答集計を見る</a>
-  </div>
-</form>
-
-<div id="result"></div>
-<div id="response-info" style="display: none;">
-  <div><strong>回答者</strong><br><span id="responder-names"></span></div>
-  <div class="note">※回答を修正したい場合は前回に回答した際と同じ名前で入力の上、再度ご回答ください。</div>
-</div>
-
-<!-- 🔽 スクリプト -->
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyATmNqFm7juv8Vie3-62-L62BG8pCnCxWQ",
-    authDomain: "github-nomikai-form.firebaseapp.com",
-    projectId: "github-nomikai-form",
-    storageBucket: "github-nomikai-form.firebasestorage.app",
-    messagingSenderId: "1025705286107",
-    appId: "1:1025705286107:web:8d915cd8273e5d58c96ffe",
-    measurementId: "G-SKHX86H3E5"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  const days = [
-    "6月1日（日）",
-    "6月7日（土）",
-    "6月8日（日）",
-    "6月14日（土）",
-    "6月15日（日）",
-    "6月21日（土）",
-    "6月22日（日）",
-    "6月28日（土）",
-    "6月29日（日）"
-  ];
-
-  const container = document.getElementById("days-container");
-  days.forEach((day, index) => {
-    const group = document.createElement("div");
-    group.className = "day-group";
-    group.innerHTML = `
-      <div class="day-label">${day}</div>
-      <div class="time-pair-row">
-        <label><input type="checkbox" data-day="${day}" data-time="昼" /> 昼</label>
-        <label><input type="checkbox" data-day="${day}" data-time="夜" /> 夜</label>
+    <form id="schedule-form">
+      <div class="form-group">
+        <label for="name">名前：</label>
+        <input type="text" id="name" required placeholder="さがら" />
       </div>
-    `;
-    container.appendChild(group);
-  });
 
-  async function showResponders() {
-    const snapshot = await db.collection("responses").get();
-    const names = snapshot.docs.map(doc => doc.data().name).filter(n => n);
-    document.getElementById("responder-names").textContent = names.join(" / ");
-    document.getElementById("response-info").style.display = "block";
-  }
-  showResponders();
-
-  document.getElementById("schedule-form").addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const name = document.getElementById("name").value.trim();
-    if (!name) {
-      alert("名前を入力してください！");
-      return;
-    }
-
-    const inputs = document.querySelectorAll('input[type="checkbox"]');
-    const responses = {};
-
-    days.forEach(day => {
-      const dayInputs = Array.from(inputs).filter(input => input.dataset.day === day);
-      responses[day] = {
-        昼: dayInputs.find(i => i.dataset.time === "昼").checked,
-        夜: dayInputs.find(i => i.dataset.time === "夜").checked
-      };
-    });
-
-    const responseData = {
-      name: name,
-      responses: responses,
-      timestamp: new Date()
+      <div class="day-group">
+        <div class="day-label">6月1日（日）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-1">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-2">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="day-group">
+        <div class="day-label">6月7日（土）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-3">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-4">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="day-group">
+        <div class="day-label">6月8日（日）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-5">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-6">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="day-group">
+        <div class="day-label">6月14日（土）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-7">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-8">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="day-group">
+        <div class="day-label">6月15日（日）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-9">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-10">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="day-group">
+        <div class="day-label">6月21日（土）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-11">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-12">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="day-group">
+        <div class="day-label">6月22日（日）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-13">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-14">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="day-group">
+        <div class="day-label">6月28日（土）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-15">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-16">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="day-group">
+        <div class="day-label">6月29日（日）</div>
+        <div class="time-pair-row">
+          <div class="time-slot" data-slot="slot-17">
+            <div class="time-label">12:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+          <div class="time-slot" data-slot="slot-18">
+            <div class="time-label">17:00～</div>
+            <button type="button" class="option-button" data-value="○">○</button>
+            <button type="button" class="option-button" data-value="△">△</button>
+            <button type="button" class="option-button" data-value="✕">✕</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="button-group">
+        <button class="submit-button" type="submit">送信</button>
+        <a href="responses.html" class="result-link">回答集計を見る</a>
+      </div>
+    </form>
+    <div id="result"></div>
+    <div id="response-info" style="display: none;">
+      <div><strong>回答者</strong><br><span id="responder-names"></span></div>
+      <div class="note">※回答を修正したい場合は前回に回答した際と同じ名前で入力の上、再度ご回答ください。</div>
+    </div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyATmNqFm7juv8Vie3-62-L62BG8pCnCxWQ",
+      authDomain: "github-nomikai-form.firebaseapp.com",
+      projectId: "github-nomikai-form",
+      storageBucket: "github-nomikai-form.firebasestorage.app",
+      messagingSenderId: "1025705286107",
+      appId: "1:1025705286107:web:8d915cd8273e5d58c96ffe",
+      measurementId: "G-SKHX86H3E5"
     };
-
-    try {
-      const querySnapshot = await db.collection("responses").where("name", "==", name).get();
-      if (!querySnapshot.empty) {
-        const docId = querySnapshot.docs[0].id;
-        await db.collection("responses").doc(docId).set(responseData);
-      } else {
-        await db.collection("responses").add(responseData);
-      }
-
-      alert("送信が完了しました！");
-      document.getElementById("result").innerHTML = `
-        <h2>ありがとうございました！</h2>
-        <p><strong>${name}</strong> さんのご回答：</p>
-        <ul>
-          ${Object.entries(responses).map(([day, times]) =>
-            `<li>${day}：${[
-              times.昼 ? "昼" : "",
-              times.夜 ? "夜" : ""
-            ].filter(Boolean).join("・") || "不参加"}</li>`).join("")
-          }
-        </ul>
-      `;
-      document.getElementById("schedule-form").reset();
-      await showResponders();
-    } catch (error) {
-      console.error("送信エラー:", error);
-      alert("送信に失敗しました。");
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const form = document.getElementById("schedule-form");
+    const result = document.getElementById("result");
+    const selection = {};
+    document.querySelectorAll(".time-slot").forEach((row) => {
+      const slotName = row.dataset.slot;
+      const buttons = row.querySelectorAll(".option-button");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          selection[slotName] = btn.dataset.value;
+          buttons.forEach((b) => b.classList.remove("selected"));
+          btn.classList.add("selected");
+        });
+      });
+    });
+    async function showResponders() {
+      const snapshot = await db.collection("responses").get();
+      const names = snapshot.docs.map(doc => doc.data().name).filter(n => n);
+      document.getElementById("responder-names").textContent = names.join(" / ");
+      document.getElementById("response-info").style.display = "block";
     }
-  });
-</script>
+    showResponders();
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const missing = ["slot-1", "slot-2", "slot-3", "slot-4", "slot-5", "slot-6", "slot-7", "slot-8", "slot-9", "slot-10", "slot-11", "slot-12", "slot-13", "slot-14", "slot-15", "slot-16", "slot-17", "slot-18"].filter((slot) => !selection[slot]);
+      if (missing.length > 0) {
+        alert("すべての時間帯について選択してください！");
+        return;
+      }
+      const responseData = {
+        name: name,
+        responses: {
+          "6月1日（日）12:00～": selection["slot-1"],
+          "6月1日（日）17:00～": selection["slot-2"],
+          "6月7日（土）12:00～": selection["slot-3"],
+          "6月7日（土）17:00～": selection["slot-4"],
+          "6月8日（日）12:00～": selection["slot-5"],
+          "6月8日（日）17:00～": selection["slot-6"],
+          "6月14日（土）12:00～": selection["slot-7"],
+          "6月14日（土）17:00～": selection["slot-8"],
+          "6月15日（日）12:00～": selection["slot-9"],
+          "6月15日（日）17:00～": selection["slot-10"],
+          "6月21日（土）12:00～": selection["slot-11"],
+          "6月21日（土）17:00～": selection["slot-12"],
+          "6月22日（日）12:00～": selection["slot-13"],
+          "6月22日（日）17:00～": selection["slot-14"],
+          "6月28日（土）12:00～": selection["slot-15"],
+          "6月28日（土）17:00～": selection["slot-16"],
+          "6月29日（日）12:00～": selection["slot-17"],
+          "6月29日（日）17:00～": selection["slot-18"],
+        },
+        timestamp: new Date()
+      };
+      try {
+        const querySnapshot = await db.collection("responses").where("name", "==", name).get();
+        if (!querySnapshot.empty) {
+          const docId = querySnapshot.docs[0].id;
+          await db.collection("responses").doc(docId).set(responseData);
+        } else {
+          await db.collection("responses").add(responseData);
+        }
+        alert("送信が完了しました！");
+        result.innerHTML = 
+          <h2>ありがとうございました！</h2>
+          <p><strong>${name}</strong> さんのご回答：</p>
+          <ul>
+            ${Object.entries(responseData.responses).map(([time, value]) => <li>${time}：${value}</li>).join("")}
+          </ul>
+        ;
+        form.reset();
+        document.querySelectorAll(".option-button").forEach((b) => b.classList.remove("selected"));
+        await showResponders();
+      } catch (error) {
+        console.error("送信エラー:", error);
+        alert("送信に失敗しました。");
+      }
+    });
+  </script>
 </body>
 </html>
