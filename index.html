@@ -20,19 +20,29 @@
       text-align: center;
     }
     h1 { font-size: 28px; margin-bottom: 30px; }
+
     .form-group {
       margin-bottom: 25px;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
     }
-    .form-group label { font-weight: bold; }
+    .form-group label {
+      font-weight: bold;
+      font-size: 16px;
+    }
     input[type="text"] {
       padding: 6px;
       font-size: 16px;
-      width: 200px;
+      width: 100%;
+      max-width: 300px;
       box-sizing: border-box;
+    }
+    .form-note {
+      font-size: 14px;
+      margin-top: 4px;
+      color: #333;
     }
 
     .schedule-grid {
@@ -40,25 +50,21 @@
       grid-template-columns: 1fr 1fr;
       gap: 30px 20px;
     }
-
     .day-block {
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      padding: 12px;
+      padding: 14px;
       min-height: 90px;
     }
-
     .day-label {
       font-weight: bold;
       margin-bottom: 10px;
     }
-
     .button-group {
       display: flex;
       gap: 12px;
       justify-content: center;
     }
-
     .time-toggle-button {
       padding: 8px 16px;
       font-size: 16px;
@@ -131,11 +137,12 @@
 </head>
 <body>
   <div class="container">
-    <h1>🍻 局長・櫻井さんおめでとう会日程調整 🍻</h1>
+    <h1>🍻局長・櫻井さんおめでとう会🍻</h1>
     <form id="schedule-form">
       <div class="form-group">
-        <label for="name">名前：</label>
+        <label for="name">なまえを入れてね👇</label>
         <input type="text" id="name" required placeholder="さがら" />
+        <p class="form-note">ご都合の良い日時をクリック！<br>ご都合の悪い日は何も押さずでOKです👍</p>
       </div>
 
       <div class="schedule-grid" id="schedule-grid"></div>
@@ -153,6 +160,7 @@
       <div class="note">※回答を修正したい場合は前回に回答した際と同じ名前で入力の上、再度ご回答ください。</div>
     </div>
   </div>
+
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script>
@@ -180,7 +188,6 @@
       ["6月28日（土）", "6月29日（日）"]
     ];
 
-    // 画面に日程を描画
     weeks.forEach(([sat, sun]) => {
       const satBlock = document.createElement("div");
       satBlock.className = "day-block";
@@ -209,14 +216,12 @@
       grid.appendChild(sunBlock);
     });
 
-    // トグルボタン切り替え処理
     document.addEventListener("click", function (e) {
       if (e.target.classList.contains("time-toggle-button")) {
         e.target.classList.toggle("active");
       }
     });
 
-    // 回答者一覧を表示
     async function showResponders() {
       const snapshot = await db.collection("responses").get();
       const names = snapshot.docs.map(doc => doc.data().name).filter(n => n);
@@ -225,7 +230,6 @@
     }
     showResponders();
 
-    // 送信処理
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       const name = document.getElementById("name").value.trim();
